@@ -1,0 +1,31 @@
+﻿  Source.cpp
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(134): warning C4311: приведение типов: усечение указателя из "_Ty" в "DWORD"
+          with
+          [
+              _Ty=char *
+          ]
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(134): warning C4302: приведение типов: усечение из "_Ty" к "DWORD"
+          with
+          [
+              _Ty=char *
+          ]
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(147): warning C4311: приведение типов: усечение указателя из "_Ty" в "DWORD"
+          with
+          [
+              _Ty=HWND
+          ]
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(147): warning C4302: приведение типов: усечение из "_Ty" к "DWORD"
+          with
+          [
+              _Ty=HWND
+          ]
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(171): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(200): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(201): warning C4244: аргумент: преобразование "float" в "BYTE", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(276): warning C4311: приведение типов: усечение указателя из "HWND" в "DWORD"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(276): warning C4302: приведение типов: усечение из "HWND" к "DWORD"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(289): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(294): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(355): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(367): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+  Autoclicker.vcxproj -> D:\5 сем\Курсач\Autoclicker\x64\Debug\Autoclicker.exe
