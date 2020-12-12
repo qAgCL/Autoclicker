@@ -4,11 +4,21 @@
 #include <psapi.h>
 #include <vector>
 #include <chrono>
+#include <fstream>
+#include <string>
+#include <thread>
+#include <sstream>
+#include <tchar.h>
+
 using namespace std;
 using namespace std::chrono;
+
 INT_PTR CALLBACK MainDlgProc(HWND, UINT, WPARAM,LPARAM);
 INT_PTR CALLBACK ManagerDlgProc(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK EnumWindowsProc(HWND, LPARAM);
+LRESULT CALLBACK KeyBoard(int iCode, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK MouseMove(int iCode, WPARAM wParam, LPARAM lParam);
+
 HBRUSH hPixelBrush;
 HDC hdcPixelColor;
 
@@ -23,9 +33,11 @@ HWND hwPosY;
 HWND hwColor;
 HWND hwMainDialog;
 HWND hwRGB;
+HWND hwStatus;
 HINSTANCE hiMain;
-HHOOK hHook;
 
+HHOOK keyBoardHook;
+HHOOK mouseHook;
 
 HWND hWindowTitele;
 HWND hWinPosX;
@@ -39,7 +51,15 @@ vector<char*> winNames;
 vector<HWND> winHwnd;
 
 UINT MainTimer = 322;
-LRESULT CALLBACK MouseKey(int iCode, WPARAM wParam, LPARAM lParam);
+BOOL StartTrace = FALSE;
+BOOL moveFlag = FALSE;
+
+vector<string> recordCommands;
+BOOL RecordFlag = FALSE;
+
+milliseconds newTime, oldTime;
+
+HANDLE executeThread;
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -47,16 +67,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	hiMain = hInstance;
 	hwMainDialog = CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, (MainDlgProc), 0);
-
 	HMENU hmenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
+	
 	SetMenu(hwMainDialog, hmenu);
-
-	SetTimer(hwMainDialog, MainTimer, 5,NULL);
+	SetTimer(hwMainDialog, MainTimer, 100,NULL);
 
 	ShowWindow(hwMainDialog, nCmdShow);
 	UpdateWindow(hwMainDialog);
+	
 	MSG msg;
-	hHook = SetWindowsHookEx(WH_MOUSE_LL, MouseKey, NULL, NULL);
+	
+	keyBoardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyBoard, NULL, NULL);
+	mouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseMove, NULL, NULL);
+
 	HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
@@ -71,7 +94,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 	DestroyMenu(hmenu);
 	KillTimer(hwMainDialog, MainTimer);
-	UnhookWindowsHookEx(hHook);
+
+	UnhookWindowsHookEx(keyBoardHook);
+	UnhookWindowsHookEx(mouseHook);
 	return 0;
 }
 
@@ -86,7 +111,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 			winHwnd.push_back(hwnd);
 		}
 	}
-	return TRUE;
+	return TRUE;	
 }
 
 DWORD WINAPI ChangeColor(HWND h)
@@ -135,6 +160,128 @@ void WINAPI ChangeWindowsInfo() {
 	SetWindowText(hSelectWindow, selectCh);
 }
 
+DWORD WINAPI DoRecordComand(LPVOID lpParam) {
+	while (1) {
+		ifstream in("log.txt");
+		if (in.is_open())
+		{
+			string line;
+			while (getline(in, line))
+			{
+				string buf;
+				int x, y;
+				if (line.find("keyDown:") != string::npos) {
+					for (int i = 8; i < line.size(); i++) {
+						buf += line[i];
+					}
+					std::stringstream geek(buf);
+					int x = 0;
+					geek >> x;
+					keybd_event(x, 0, 0, 0);
+				}
+				if (line.find("keyUp:") != string::npos) {
+					for (int i = 6; i < line.size(); i++) {
+						buf += line[i];
+					}
+					std::stringstream geek(buf);
+					int x = 0;
+					geek >> x;
+					keybd_event(x, 0, KEYEVENTF_KEYUP, 0);
+				}
+				if (line.find("move:") != string::npos) {
+					for (int i = 5; i < line.size(); i++) {
+						if (line[i] == ';') {
+							std::stringstream geek(buf);
+							geek >> x;
+							buf = "";
+						}
+						else {
+							buf += line[i];
+						}
+					}
+					std::stringstream geek(buf);
+					geek >> y;
+					SetCursorPos(x, y);
+				}
+				if (line.find("rButtonDown:") != string::npos) {
+					for (int i = 12; i < line.size(); i++) {
+						if (line[i] == ';') {
+							std::stringstream geek(buf);
+							geek >> x;
+							buf = "";
+						}
+						else {
+							buf += line[i];
+						}
+					}
+					std::stringstream geek(buf);
+					geek >> y;
+					SetCursorPos(x, y);
+					mouse_event(MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0);
+				}
+				if (line.find("rButtonUp:") != string::npos) {
+					for (int i = 10; i < line.size(); i++) {
+						if (line[i] == ';') {
+							stringstream geek(buf);
+							geek >> x;
+							buf = "";
+						}
+						else {
+							buf += line[i];
+						}
+					}
+					stringstream geek(buf);
+					geek >> y;
+					SetCursorPos(x, y);
+					mouse_event(MOUSEEVENTF_RIGHTUP, x, y, 0, 0);
+				}
+				if (line.find("lButtonDown:") != string::npos) {
+					for (int i = 12; i < line.size(); i++) {
+						if (line[i] == ';') {
+							std::stringstream geek(buf);
+							geek >> x;
+							buf = "";
+						}
+						else {
+							buf += line[i];
+						}
+					}
+					std::stringstream geek(buf);
+					geek >> y;
+					SetCursorPos(x, y);
+					mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+				}
+				if (line.find("lButtonUp:") != string::npos) {
+					for (int i = 10; i < line.size(); i++) {
+						if (line[i] == ';') {
+							stringstream geek(buf);
+							geek >> x;
+							buf = "";
+						}
+						else {
+							buf += line[i];
+						}
+					}
+					stringstream geek(buf);
+					geek >> y;
+					SetCursorPos(x, y);
+					mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+				}
+				if (line.find("sleep:") != string::npos) {
+					for (int i = 6; i < line.size(); i++) {
+						buf += line[i];
+					}
+					stringstream geek(buf);
+					int x = 0;
+					geek >> x;
+					Sleep(x);
+				}
+			}
+			in.close();
+		}
+	}
+	return 0;
+}
 void WINAPI GetSelectedInfo(int num) {
 	WINDOWINFO windowInfo; 
 	windowInfo.cbSize = sizeof(WINDOWINFO);
@@ -217,6 +364,7 @@ INT_PTR  CALLBACK MainDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		hwPosY = GetDlgItem(hWnd, IDC_POSY);
 		hwColor = GetDlgItem(hWnd, IDC_COLOR);
 		hwRGB = GetDlgItem(hWnd, IDC_RGB);
+		hwStatus = GetDlgItem(hWnd, IDC_STATUS);
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -228,12 +376,10 @@ INT_PTR  CALLBACK MainDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		case WINDOW_MANAGER:
 			DialogBoxParam(hiMain, MAKEINTRESOURCE(IDD_DIALOG2), hWnd, (ManagerDlgProc), 0);
 			break;
-		case ID_LOG:
-			SendMessage(windowDesc, WM_SYSCOMMAND, SC_CLOSE, 0);
-			break;
-		case ID_RECORD:
-
-			break;
+		case ID_QUIT:
+			DestroyWindow(hWnd);
+			PostQuitMessage(0);
+			return TRUE;
 		}
 	case WM_CTLCOLORSTATIC:
 		if ((HWND)lParam == hwColor)
@@ -300,7 +446,6 @@ INT_PTR  CALLBACK MainDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			i++;
 			processName[j] = fullProcessWay[i];
 		}
-
 
 		SetWindowText(hwProcessName, processName);
 		SetWindowText(hwProcessWay, fullProcessWay);
@@ -377,10 +522,132 @@ INT_PTR  CALLBACK ManagerDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
+LRESULT CALLBACK KeyBoard(_In_ int iCode, _In_  WPARAM wParam, _In_  LPARAM lParam) {
+	DWORD SHIFT_key = 0;
+	DWORD CTRL_key = 0;
+	DWORD ALT_key = 0;
+	KBDLLHOOKSTRUCT hooked_key = *((KBDLLHOOKSTRUCT*)lParam);
+	
+	int key = hooked_key.vkCode;
+	
+	SHIFT_key = GetAsyncKeyState(VK_SHIFT);
+	CTRL_key = GetAsyncKeyState(VK_CONTROL);
+	ALT_key = GetAsyncKeyState(VK_MENU);
+	if (RecordFlag) {
+		DWORD delay = 0;
+		newTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+		delay = (newTime - oldTime).count();
+		oldTime = newTime;
+		recordCommands.push_back("sleep:" + to_string(delay) + "\n");
+		if ((iCode == HC_ACTION) && ((wParam == WM_SYSKEYDOWN) || (wParam == WM_KEYDOWN)))
+		{
+			recordCommands.push_back("keyDown:" + to_string(key) + "\n");
+		}
+		if ((iCode == HC_ACTION) && ((wParam == WM_SYSKEYUP) || (wParam == WM_KEYUP))) {
 
-LRESULT CALLBACK MouseKey(int iCode, WPARAM wParam, LPARAM lParam) {
-	if (iCode >= 0 && wParam == WM_RBUTTONDOWN) {
-		MessageBox(NULL, "ASD", "ASD", MB_OK);
+			recordCommands.push_back("keyUp:" + to_string(key) + "\n");
+		}
 	}
-	return CallNextHookEx(hHook, iCode, wParam, lParam);
+	if ((iCode == HC_ACTION) && ((wParam == WM_SYSKEYDOWN) || (wParam == WM_KEYDOWN)))
+	{
+
+		if (ALT_key != 0 && key == 'T')
+		{
+			SendMessage(windowDesc, WM_SYSCOMMAND, SC_CLOSE, 0);
+		}
+		if (ALT_key != 0 && key == 'X')
+		{
+			SetWindowText(hwStatus, "WAITING FOR RECORDING");
+			TerminateThread(executeThread, 5);
+		}
+		if (ALT_key != 0 && key == 'G')
+		{
+			SetWindowText(hwStatus, "REPLAY");
+			executeThread = CreateThread(NULL,0, DoRecordComand,NULL,0,NULL);
+			DWORD status;
+			while (1) {
+				GetExitCodeThread(executeThread, &status);
+				if (status == 0) {
+					break;
+				}
+				if (status == 5) {
+					MessageBox(NULL, "HAD", "ASD", MB_OK);
+					break;
+				}
+			}
+			//WaitForSingleObject(executeThread, INFINITE);
+			CloseHandle(executeThread);
+		}
+		if (ALT_key != 0 && key == 'R')
+		{
+			RecordFlag = true;
+			oldTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+			recordCommands.clear();
+			SetWindowText(hwStatus, "RECORDING");
+		}
+		if (ALT_key != 0 && key == 'S')
+		{
+			if (RecordFlag == true) {
+				SetWindowText(hwStatus, "WAITING FOR RECORDING");
+				RecordFlag = false;
+				std::ofstream out;
+				out.open("log.txt");
+				for (int i = 4; i < recordCommands.size() - 4; i++) {
+					out << recordCommands[i];
+				}
+				out.close();
+				recordCommands.clear();
+			}
+		}
+	}
+	return CallNextHookEx(keyBoardHook, iCode, wParam, lParam);
+}
+
+LRESULT CALLBACK MouseMove(_In_ int iCode, _In_  WPARAM wParam, _In_  LPARAM lParam) {
+	
+	if (RecordFlag && iCode >= 0) {
+		PMSLLHOOKSTRUCT p = (PMSLLHOOKSTRUCT)lParam;
+		DWORD delay = 0;
+		switch (wParam)
+		{
+			case WM_MOUSEMOVE:
+				newTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+				delay = (newTime - oldTime).count();
+				if (delay > 5) {
+					recordCommands.push_back("sleep:" + to_string(delay) + "\n");
+					recordCommands.push_back("move:" + to_string(p->pt.x) + ";" + to_string(p->pt.y) + "\n");
+					oldTime = newTime;
+				}
+				break;
+			case WM_RBUTTONDOWN:
+				newTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+			    delay = (newTime - oldTime).count();
+				oldTime = newTime;
+				recordCommands.push_back("sleep:" + to_string(delay) + "\n");
+				recordCommands.push_back("rButtonDown:" + to_string(p->pt.x) + ";" + to_string(p->pt.y) + "\n");
+				break;
+			case WM_RBUTTONUP:
+				newTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+				delay = (newTime - oldTime).count();
+				oldTime = newTime;
+				recordCommands.push_back("sleep:" + to_string(delay) + "\n");
+				recordCommands.push_back("rButtonUp:" + to_string(p->pt.x) + ";" + to_string(p->pt.y) + "\n");
+				break;
+			case WM_LBUTTONDOWN:
+				newTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+				delay = (newTime - oldTime).count();
+				oldTime = newTime;
+				recordCommands.push_back("sleep:" + to_string(delay) + "\n");
+				recordCommands.push_back("lButtonDown:" + to_string(p->pt.x) + ";" + to_string(p->pt.y) + "\n");
+				break;
+			case WM_LBUTTONUP:
+				newTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+				delay = (newTime - oldTime).count();
+				oldTime = newTime;
+				recordCommands.push_back("sleep:" + to_string(delay) + "\n");
+				recordCommands.push_back("lButtonUp:" + to_string(p->pt.x) + ";" + to_string(p->pt.y) + "\n");
+				break;
+			}
+	}
+	return CallNextHookEx(mouseHook, iCode, wParam, lParam);
 }

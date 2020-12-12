@@ -28,10 +28,12 @@
 #define IDC_REFRESH                     1028
 #define IDC_ACCEPT                      1032
 #define IDC_DESTROY                     1033
+#define IDC_STATUS                      1034
 #define ID_40001                        40001
 #define TEST_THIS                       40002
 #define WINDOW_MANAGER                  40003
 #define ID_LOG                          40007
+#define ID_QUIT                         40007
 #define ID_RECORD                       40008
 
 // Next default values for new objects
@@ -40,7 +42,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        112
 #define _APS_NEXT_COMMAND_VALUE         40010
-#define _APS_NEXT_CONTROL_VALUE         1034
+#define _APS_NEXT_CONTROL_VALUE         1035
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
