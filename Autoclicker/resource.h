@@ -7,6 +7,7 @@
 #define IDR_MENU2                       107
 #define IDD_DIALOG2                     108
 #define IDR_ACCELERATOR1                111
+#define IDD_DIALOG3                     112
 #define IDC_STATIC2                     1006
 #define IDC_PROCESS_NAME                1007
 #define IDC_PID                         1009
@@ -29,20 +30,31 @@
 #define IDC_ACCEPT                      1032
 #define IDC_DESTROY                     1033
 #define IDC_STATUS                      1034
+#define IDC_NUMREP                      1035
+#define IDC_SPINREP                     1036
+#define IDC_CHECKINF                    1038
+#define IDC_DELAYREP                    1039
+#define IDC_SPINDELPER                  1040
+#define IDC_DELSTART                    1041
+#define IDC_SPINSTART                   1042
+#define IDC_REPLAY                      1043
+#define IDC_RECORD                      1044
+#define IDC_EDIT1                       1047
+#define IDC_POSITIONS                   1047
 #define ID_40001                        40001
 #define TEST_THIS                       40002
 #define WINDOW_MANAGER                  40003
-#define ID_LOG                          40007
 #define ID_QUIT                         40007
 #define ID_RECORD                       40008
+#define ID_HOTKEYS                      40010
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        112
-#define _APS_NEXT_COMMAND_VALUE         40010
-#define _APS_NEXT_CONTROL_VALUE         1035
+#define _APS_NEXT_RESOURCE_VALUE        114
+#define _APS_NEXT_COMMAND_VALUE         40011
+#define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
