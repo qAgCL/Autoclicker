@@ -1,0 +1,3 @@
+lButtonDown:1403;690
+sleep:78
+lButtonUp:1403;690

@@ -1,65 +1,66 @@
 ﻿  Source.cpp
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(197): warning C4311: приведение типов: усечение указателя из "_Ty" в "DWORD"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(206): warning C4311: приведение типов: усечение указателя из "_Ty" в "DWORD"
           with
           [
               _Ty=char *
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(197): warning C4302: приведение типов: усечение из "_Ty" к "DWORD"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(206): warning C4302: приведение типов: усечение из "_Ty" к "DWORD"
           with
           [
               _Ty=char *
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(337): warning C4311: приведение типов: усечение указателя из "_Ty" в "DWORD"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(346): warning C4311: приведение типов: усечение указателя из "_Ty" в "DWORD"
           with
           [
               _Ty=HWND
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(337): warning C4302: приведение типов: усечение из "_Ty" к "DWORD"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(346): warning C4302: приведение типов: усечение из "_Ty" к "DWORD"
           with
           [
               _Ty=HWND
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(361): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(390): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(391): warning C4244: аргумент: преобразование "float" в "BYTE", возможна потеря данных
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(450): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(481): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(568): warning C4311: приведение типов: усечение указателя из "HWND" в "DWORD"
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(568): warning C4302: приведение типов: усечение из "HWND" к "DWORD"
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(581): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(586): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(621): warning C4060: оператор switch не содержит метку "case" или "default"
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(664): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(676): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(704): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(370): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(399): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(400): warning C4244: аргумент: преобразование "float" в "BYTE", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(463): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(494): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(581): warning C4311: приведение типов: усечение указателя из "HWND" в "DWORD"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(581): warning C4302: приведение типов: усечение из "HWND" к "DWORD"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(594): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(599): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(634): warning C4060: оператор switch не содержит метку "case" или "default"
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(725): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(737): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(765): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
           with
           [
               _Rep=__int64
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(725): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(732): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(773): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(830): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(885): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(892): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(933): warning C4805: ==: небезопасное смешение типа "BOOL" и типа "bool" в операции
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(808): warning C4101: rect: неиспользованная локальная переменная
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(990): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
           with
           [
               _Rep=__int64
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(839): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(999): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
           with
           [
               _Rep=__int64
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(846): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(1006): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
           with
           [
               _Rep=__int64
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(853): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(1013): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
           with
           [
               _Rep=__int64
           ]
-d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(860): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
+d:\5 сем\курсач\autoclicker\autoclicker\source.cpp(1020): warning C4244: =: преобразование "_Rep" в "DWORD", возможна потеря данных
           with
           [
               _Rep=__int64

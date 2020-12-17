@@ -10,9 +10,12 @@
 #include <sstream>
 #include <tchar.h>
 #include <commctrl.h>
+#include "ScreenMaker.h"
+
 using namespace std;
 using namespace std::chrono;
 
+INT_PTR  CALLBACK CodeDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK MainDlgProc(HWND, UINT, WPARAM,LPARAM);
 INT_PTR CALLBACK ManagerDlgProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK HotKeysDlgProc(HWND, UINT, WPARAM, LPARAM);
@@ -56,7 +59,7 @@ HHOOK keyBoardHook;
 HHOOK mouseHook;
 
 HWND hWindowTitele;
-HWND hWinPosX;
+HWND hWinPosX;	
 HWND hWinPosY;
 HWND hWinHeight;
 HWND hWinWidth;
@@ -66,6 +69,7 @@ HWND hAllWindow;
 vector<char*> winNames;
 vector<HWND> winHwnd;
 
+HWND hwCodeEdt;
 UINT MainTimer = 322;
 BOOL StartTrace = FALSE;
 BOOL moveFlag = FALSE;
@@ -87,6 +91,11 @@ char windowDescCh[11] = { 0 };
 char processIDCh[11] = { 0 };
 char * processName;
 char rgbString[34] = { 0 };
+
+HWND hwScrennStatus;
+BOOL screenFlag = false;
+POINT points[2];
+int makePoint;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -202,7 +211,7 @@ DWORD WINAPI DoRecordComand(LPVOID lpParam) {
 	Sleep(delayBeforeStart);
 	for (DWORD i = 1; i <= numOfRepeats; i++) {
 		Sleep(delayBetweenRepeats);
-		in.open("log.txt");
+		in.open("log.txt");				
 		if (in.is_open())
 		{
 			string line;
@@ -412,6 +421,7 @@ INT_PTR  CALLBACK MainDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		hwReplay = GetDlgItem(hWnd, IDC_REPLAY);
 		hwRecord = GetDlgItem(hWnd, IDC_RECORD);
 		hwPositions = GetDlgItem(hWnd, IDC_POSITIONS);
+		hwScrennStatus = GetDlgItem(hWnd, IDC_SCREEN);
 
 		hwNumRep = GetDlgItem(hWnd, IDC_NUMREP);
 		hwSpinRep = GetDlgItem(hWnd, IDC_SPINREP);
@@ -439,6 +449,9 @@ INT_PTR  CALLBACK MainDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			DestroyWindow(hWnd);
 			PostQuitMessage(0);
 			return TRUE;
+		case ID_CODEREDACTOR:
+			DialogBoxParam(hiMain, MAKEINTRESOURCE(IDD_DIALOG4), hWnd, (CodeDlgProc), 0);
+			break;
 		case WINDOW_MANAGER:
 			DialogBoxParam(hiMain, MAKEINTRESOURCE(IDD_DIALOG2), hWnd, (ManagerDlgProc), 0);
 			break;
@@ -626,6 +639,54 @@ INT_PTR  CALLBACK HotKeysDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	}
 	return FALSE;
 }
+
+INT_PTR  CALLBACK CodeDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	ifstream log;
+	ofstream save;
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+		hwCodeEdt = GetDlgItem(hWnd, IDC_CODE);
+		log.open("log.txt");
+		if (log.is_open())
+		{
+			string line;
+			string result;
+			while (getline(log, line))
+			{
+				result += line;
+				result += "\r\n";
+			}
+			log.close();
+			SetWindowText(hwCodeEdt, result.c_str());
+		}
+		break;
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+			case IDC_CLEAR:
+				SetWindowText(hwCodeEdt, "");
+				break;
+			case IDC_SAVE:
+				int length = GetWindowTextLength(hwCodeEdt);
+				char* text = (char*)malloc(length + 2);
+				GetWindowText(hwCodeEdt, text, length + 2);
+				save.open("log.txt");
+				if (save.is_open())
+				{
+					save << text;
+					save.close();
+				}
+				break;
+		}
+		break;
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		return FALSE;
+	}
+	return FALSE;
+}
+
 INT_PTR  CALLBACK ManagerDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg)
 	{
@@ -715,7 +776,106 @@ LRESULT CALLBACK KeyBoard(_In_ int iCode, _In_  WPARAM wParam, _In_  LPARAM lPar
 	}
 	if ((iCode == HC_ACTION) && ((wParam == WM_SYSKEYDOWN) || (wParam == WM_KEYDOWN)))
 	{
+		if (ALT_key != 0 && key == 'Z') {
+			if (screenFlag) {
+				screenFlag = false;
+				makePoint = 0;
+				SetWindowText(hwScrennStatus, "Screenshot not running, ALT+Z to start");
+			}
+			else {
+				screenFlag = true;
+				makePoint = 0;
+				SetWindowText(hwScrennStatus, "Press ALT+E to make fist point or ALT+Z to reset");
+			}
+		}
+		if (ALT_key != 0 && key == 'E') {
+			if (screenFlag) {
+				switch (makePoint)
+				{
+					case 0:
+						GetCursorPos(&points[makePoint]);
+						makePoint++;
+						SetWindowText(hwScrennStatus, "Press ALT+E to make second point or ALT+Z to reset");
+						break;
+					case 1:
+						GetCursorPos(&points[makePoint]);
+						screenFlag = false;
+						makePoint = 0;
+						SetWindowText(hwScrennStatus, "Screenshot not running, ALT+Z to start");
+						HWND hwnd;
+						HDC hdc[2];
+						HBITMAP hbitmap;
+						RECT rect;
+						int minX, minY,maxX,maxY;
 
+						if (points[0].x > points[1].x) {
+							minX = points[1].x;
+							maxX = points[0].x;
+						}
+						else {
+							minX = points[0].x;
+							maxX = points[1].x;
+						}
+
+						if (points[0].y > points[1].y) {
+							minY = points[1].y;
+							maxY = points[0].y;
+						}
+						else {
+							minY = points[0].y;
+							maxY = points[1].y;
+						}
+
+
+						hwnd = GetDesktopWindow();
+						hdc[0] = GetWindowDC(hwnd);
+						hbitmap = CreateCompatibleBitmap(hdc[0], abs(maxX-minX),abs(maxY-minY));
+						hdc[1] = CreateCompatibleDC(hdc[0]);
+						SelectObject(hdc[1], hbitmap);
+
+						BitBlt(
+							hdc[1],
+							0,
+							0,
+							abs(maxX - minX),
+							abs(maxY - minY),
+							hdc[0],
+							minX,
+							minY,
+							SRCCOPY
+						);
+
+						OPENFILENAME ofn = { 0 };
+
+						char szDirect[MAX_PATH] = { 0 };
+						char szFileName[MAX_PATH] = { 0 };
+						ofn.lStructSize = sizeof(ofn);
+						ofn.hwndOwner = hwMainDialog;
+
+						ofn.lpstrFile = szDirect;
+						*(ofn.lpstrFile) = 0;
+						ofn.nMaxFile = sizeof(szDirect);
+
+						ofn.lpstrFilter = "Bitmap files(*.bmp)\0*.BMP\0";
+						ofn.nFilterIndex = 0;
+						ofn.lpstrFileTitle = szFileName;
+						*(ofn.lpstrFileTitle) = 0;
+						ofn.nMaxFileTitle = sizeof(szFileName);
+						ofn.lpstrInitialDir = NULL;
+						ofn.Flags = OFN_EXPLORER| OFN_NOCHANGEDIR;
+
+						if(GetSaveFileName(&ofn))
+							CreateBMPFile(ofn.lpstrFile, hbitmap);
+
+						DeleteObject(hbitmap);
+						ReleaseDC(hwnd, hdc[0]);
+						DestroyWindow(hwnd);
+						DeleteDC(hdc[0]);
+						DeleteDC(hdc[1]);
+						break;
+				}
+			}
+		}
 		if (ALT_key != 0 && key == 'T')
 		{
 			SendMessage(windowDesc, WM_SYSCOMMAND, SC_CLOSE, 0);
@@ -866,3 +1026,4 @@ LRESULT CALLBACK MouseMove(_In_ int iCode, _In_  WPARAM wParam, _In_  LPARAM lPa
 	}
 	return CallNextHookEx(mouseHook, iCode, wParam, lParam);
 }
+
